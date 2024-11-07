@@ -3,7 +3,7 @@ public class Peluqueria{
     public static void main(String[] args) {
         int NUM_SILLAS=5;
         int NUM_BARBEROS=4;
-        int numClientes = 6;
+        int numClientes = 3;
     
         Barbero barberos[] = new Barbero[NUM_BARBEROS]; 
         Silla gestorS;
