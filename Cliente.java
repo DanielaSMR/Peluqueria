@@ -5,22 +5,24 @@ public class Cliente implements Runnable{
     private Silla gestorS;
     private int sillaCogida;
     boolean moverse;
+    private static final int TIEMPO_MAX_ESPERA = 5000;
     
-    public Cliente(Silla gestorS,int sillaCogida,String nombre){
+    public Cliente(Silla gestorS,String nombre){
         this.nombre = nombre;
         this.gestorS = gestorS;
-        this.sillaCogida = sillaCogida;
+        this.sillaCogida = -1;
         this.moverse = true;
     }
 
     @Override
     public void run(){
         while (moverse) {
-            if(this.gestorS.cogerSillas(sillaCogida, nombre)){
+            sillaCogida = gestorS.cogerSillas(nombre);
+            if(sillaCogida != -1){
                 esperar();
-                if(this.gestorS.trabajarSillas(sillaCogida, nombre)){
-                    System.out.println("Cliente " + nombre + "le han cortado el pelo");
-                }else{
+                if (!gestorS.esSillaLibre(sillaCogida)) {
+                    moverse = false; 
+                } else {
                     irse();
                 }
             }else{
@@ -29,12 +31,19 @@ public class Cliente implements Runnable{
         }
     }
     private void esperar() {
-        System.out.println(this.nombre + " está esperando...");
-        esperarTiempoAzar();
+        System.out.println(this.nombre + " está esperando en la silla " + sillaCogida);
+        long tiempoInicial = System.currentTimeMillis();
+        while (!gestorS.esSillaLibre(sillaCogida)) {
+            if (System.currentTimeMillis() - tiempoInicial > TIEMPO_MAX_ESPERA) {
+                System.out.println(this.nombre + " se cansa de esperar y se va");
+                irse();
+            }
+            esperarTiempoAzar();
+        }
     }
     
     private void esperarTiempoAzar() {
-        int segundos = new Random().nextInt(4)+1;
+        int segundos = new Random().nextInt(4000)+1000;
         try {
             Thread.sleep(segundos);
         } catch (InterruptedException e) {

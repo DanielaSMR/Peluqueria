@@ -1,35 +1,64 @@
 public class Silla {
     
-    boolean sillas[];
+    private boolean sillas[];
+    private String[] clientesEnSillas;
+    private String[] barberosEnSillas; 
+
 
     public Silla(int numSillas){
         sillas = new boolean[numSillas];
+        clientesEnSillas = new String[numSillas];
+        barberosEnSillas = new String[numSillas];
+
         for(int i = 0;i < numSillas;i++){
             sillas[i] = true;
+            clientesEnSillas[i] = null;
+            barberosEnSillas[i] = null;
         }
-    }
-
-    public synchronized boolean trabajarSillas(int pos1,String nombre){
-        boolean puedenTrabajar = false;
-        if(sillas[pos1]){
-            puedenTrabajar = true;
-            System.out.println(nombre + "trabaja en la silla");
-        }
-        return puedenTrabajar;
-    }
-
-    public synchronized boolean cogerSillas(int pos1,String nombre){
-        boolean puedenSentarse = false;
-        if(sillas[pos1]){
-            sillas[pos1] = false;
-            puedenSentarse = true;
-            System.out.println(nombre + "se sienta en la silla");
-        }
-        return puedenSentarse;
     }
 
     public synchronized void liberarSillas(int pos1,String nombre){
         sillas[pos1] = true;
-        System.out.println(nombre + "Se va");
+        barberosEnSillas[pos1] = null;
+        System.out.println(nombre + "Se va de la silla" + pos1);
+    }
+
+    public synchronized int cogerSillas(String nombre) {
+        for (int i = 0; i < sillas.length; i++) {
+            if (sillas[i]) {
+                sillas[i] = false;
+                clientesEnSillas[i] = nombre;
+                System.out.println(nombre + " se sienta en la silla " + i);
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public synchronized int obtenerSillaOcupada() {
+        for (int i = 0; i < sillas.length; i++) {
+            if (!sillas[i]) {
+                return i;
+            }
+        }
+        return -1; 
+    }
+
+    public synchronized void asignarBarberoASilla(int pos, String nombreBarbero) {
+        if (pos >= 0 && pos < sillas.length) {
+            barberosEnSillas[pos] = nombreBarbero;
+        }
+    }
+
+
+    public synchronized String obtenerClienteEnSilla(int pos) {
+        if (pos >= 0 && pos < sillas.length) {
+            return clientesEnSillas[pos];
+        }
+        return null;
+    }
+
+    public synchronized boolean esSillaLibre(int pos) {
+        return pos >= 0 && pos < sillas.length && sillas[pos];
     }
 }
